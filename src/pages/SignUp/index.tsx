@@ -1,5 +1,10 @@
 import React from 'react';
-import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from '../../components/form/Button';
 import { Logo } from '../SignIn/styles';
@@ -16,9 +21,11 @@ import {
   Title,
 } from './styles';
 import { InputControl } from '../../components/form/InputControl';
+import { api } from '../../services/api';
 
 interface ScreenNavigationProp {
   goBack: () => void;
+  navigate: (screen: string) => void;
 }
 
 interface IFormInputs {
@@ -35,7 +42,9 @@ const formSchema = yup.object({
 });
 
 export const SignUp: React.FC = () => {
-  const { goBack } = useNavigation<ScreenNavigationProp>();
+  const { goBack, navigate } = useNavigation<ScreenNavigationProp>();
+
+  const [loading, setLoading] = React.useState(false);
 
   const {
     control,
@@ -45,13 +54,27 @@ export const SignUp: React.FC = () => {
     resolver: yupResolver(formSchema),
   });
 
-  const handleSignUp = (form: IFormInputs) => {
+  const handleSignUp = async (form: IFormInputs) => {
     const data = {
       name: form.name,
       email: form.email,
       password: form.password,
     };
-    console.log(data);
+    try {
+      setLoading(true);
+      await api.post('users', data);
+      Alert.alert(
+        'Cadastro realizado',
+        'Você já pode fazer login na aplicação',
+      );
+      navigate('SignIn');
+    } catch (error) {
+      Alert.alert(
+        'Erro no cadastro',
+        'Ocorreu um erro ao fazer o cadastro. Tente novamente',
+      );
+      setLoading(false);
+    }
   };
 
   return (
@@ -93,7 +116,13 @@ export const SignUp: React.FC = () => {
               secureTextEntry
               error={errors.password && errors.password.message}
             />
-            <Button title="Entrar" onPress={handleSubmit(handleSignUp)} />
+            <Button
+              title="Entrar"
+              onPress={handleSubmit(handleSignUp)}
+              disabled={
+                loading || errors.name || errors.email || errors.password
+              }
+            />
           </Content>
         </Container>
       </ScrollView>

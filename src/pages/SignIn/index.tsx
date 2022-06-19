@@ -18,6 +18,7 @@ import {
 } from './styles';
 import logo from '../../assets/logo.png';
 import { InputControl } from '../../components/form/InputControl';
+import { useAuth } from '../../context/AuthContext';
 
 interface ScreenNavigationProp {
   navigate: (screen: string) => void;
@@ -34,6 +35,7 @@ const formSchema = yup.object({
 
 export const SignIn: React.FC = () => {
   const { navigate } = useNavigation<ScreenNavigationProp>();
+  const { signIn } = useAuth();
 
   const {
     control,
@@ -48,7 +50,8 @@ export const SignIn: React.FC = () => {
       email: form.email,
       password: form.password,
     };
-    console.log(data);
+
+    signIn(data);
   };
 
   return (
@@ -82,7 +85,11 @@ export const SignIn: React.FC = () => {
               secureTextEntry
               error={errors.password && errors.password.message}
             />
-            <Button title="Entrar" onPress={handleSubmit(handleSignIn)} />
+            <Button
+              title="Entrar"
+              onPress={handleSubmit(handleSignIn)}
+              disabled={errors.email || errors.password}
+            />
             <ForgotPasswordButton onPress={() => {}}>
               <ForgotPasswordTitle>Esqueci minha senha</ForgotPasswordTitle>
             </ForgotPasswordButton>

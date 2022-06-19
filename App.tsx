@@ -9,6 +9,7 @@ import {
   Roboto_400Regular,
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
+import { AuthProvider } from './src/context/AuthContext';
 
 const App: React.FC = () => {
   const [fontsLoaded] = useFonts({
@@ -23,7 +24,9 @@ const App: React.FC = () => {
   return (
     <NavigationContainer>
       <ThemeProvider theme={theme}>
-        <Routes />
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
       </ThemeProvider>
     </NavigationContainer>
   );

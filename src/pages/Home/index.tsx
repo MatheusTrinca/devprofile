@@ -10,24 +10,48 @@ import {
   UserName,
   UserWrapper,
   Icon,
+  LogOutButton,
 } from './styles';
 import defaultAvatar from '../../assets/avatar02.png';
+import { useAuth } from '../../context/AuthContext';
+import { Alert } from 'react-native';
 
 export const Home: React.FC = () => {
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = () => {
+    Alert.alert('Tem certeza?', 'Deseja realmente sair da aplicação?', [
+      {
+        text: 'Cancelar',
+        onPress: () => {},
+      },
+      {
+        text: 'Sair',
+        onPress: () => signOut(),
+      },
+    ]);
+  };
+
   return (
     <Container>
       <Header>
         <UserWrapper>
           <UserInfo>
             <UserAvatarButton onPress={() => {}}>
-              <UserAvatar source={defaultAvatar} />
+              <UserAvatar
+                source={
+                  user.avatar_url ? { uri: user.avatar_url } : defaultAvatar
+                }
+              />
             </UserAvatarButton>
             <UserInfoDetail>
               <UserGreeting>Olá,</UserGreeting>
-              <UserName>Jorge</UserName>
+              <UserName>{user.name}</UserName>
             </UserInfoDetail>
           </UserInfo>
-          <Icon name="power" />
+          <LogOutButton onPress={handleSignOut}>
+            <Icon name="power" />
+          </LogOutButton>
         </UserWrapper>
       </Header>
     </Container>
