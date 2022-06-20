@@ -1,26 +1,30 @@
 import React from 'react';
-import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from '../../components/form/Button';
+import { Logo } from '../SignIn/styles';
+import logo from '../../assets/logo.png';
 import { useForm, FieldValues } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {
+  BackToSignIn,
+  BackToSignInTitle,
   Container,
   Content,
-  Title,
-  Logo,
-  ForgotPasswordButton,
-  ForgotPasswordTitle,
-  CreateAccount,
   Icon,
-  CreateAccountTitle,
+  Title,
 } from './styles';
-import logo from '../../assets/logo.png';
 import { InputControl } from '../../components/form/InputControl';
-import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 
 interface ScreenNavigationProp {
+  goBack: () => void;
   navigate: (screen: string) => void;
 }
 
@@ -30,12 +34,10 @@ interface IFormInputs {
 
 const formSchema = yup.object({
   email: yup.string().email('Email inválido').required('Informe um email'),
-  password: yup.string().required('Informe uma senha'),
 });
 
-export const SignIn: React.FC = () => {
-  const { navigate } = useNavigation<ScreenNavigationProp>();
-  const { signIn } = useAuth();
+export const ForgotPassword: React.FC = () => {
+  const { goBack, navigate } = useNavigation<ScreenNavigationProp>();
 
   const {
     control,
@@ -45,19 +47,26 @@ export const SignIn: React.FC = () => {
     resolver: yupResolver(formSchema),
   });
 
-  const handleSignIn = (form: IFormInputs) => {
+  const handleForgotPassword = async (form: IFormInputs) => {
     const data = {
       email: form.email,
-      password: form.password,
     };
-
-    signIn(data);
+    try {
+      await api.post('password/forgot', data);
+      Alert.alert('Email enviado', 'Redefina sua senha');
+      navigate('ResetPassword');
+    } catch (error) {
+      Alert.alert(
+        'Erro no envio do email',
+        'Ocorreu um erro ao enviar o email. Tente novamente',
+      );
+    }
   };
 
   return (
     <KeyboardAvoidingView
-      enabled
       style={{ flex: 1 }}
+      enabled
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
@@ -67,39 +76,28 @@ export const SignIn: React.FC = () => {
         <Container>
           <Content>
             <Logo source={logo} />
-            <Title>Faça seu Login</Title>
+            <Title>Informe seu email</Title>
             <InputControl
               keyboardType="email-address"
-              autoCapitalize="none"
               autoCorrect={false}
+              autoCapitalize="none"
               placeholder="Email"
-              control={control}
               name="email"
+              control={control}
               error={errors.email && errors.email.message}
             />
-            <InputControl
-              placeholder="Senha"
-              control={control}
-              name="password"
-              autoCorrect={false}
-              secureTextEntry
-              error={errors.password && errors.password.message}
-            />
             <Button
-              title="Entrar"
-              onPress={handleSubmit(handleSignIn)}
-              disabled={errors.email || errors.password}
+              title="Enviar"
+              onPress={handleSubmit(handleForgotPassword)}
+              disabled={errors.email}
             />
-            <ForgotPasswordButton onPress={() => navigate('ForgotPassword')}>
-              <ForgotPasswordTitle>Esqueci minha senha</ForgotPasswordTitle>
-            </ForgotPasswordButton>
           </Content>
         </Container>
       </ScrollView>
-      <CreateAccount onPress={() => navigate('SignUp')}>
-        <Icon name="log-in" />
-        <CreateAccountTitle>Criar uma conta</CreateAccountTitle>
-      </CreateAccount>
+      <BackToSignIn onPress={() => goBack()}>
+        <Icon name="arrow-left" />
+        <BackToSignInTitle>Voltar</BackToSignInTitle>
+      </BackToSignIn>
     </KeyboardAvoidingView>
   );
 };

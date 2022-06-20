@@ -10,6 +10,7 @@ import {
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
 import { AuthProvider } from './src/context/AuthContext';
+import { StatusBar } from 'react-native';
 
 const App: React.FC = () => {
   const [fontsLoaded] = useFonts({
@@ -23,6 +24,7 @@ const App: React.FC = () => {
 
   return (
     <NavigationContainer>
+      <StatusBar backgroundColor="transparent" translucent />
       <ThemeProvider theme={theme}>
         <AuthProvider>
           <Routes />
