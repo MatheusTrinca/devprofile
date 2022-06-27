@@ -15,9 +15,22 @@ import {
 import defaultAvatar from '../../assets/avatar02.png';
 import { useAuth } from '../../context/AuthContext';
 import { Alert } from 'react-native';
+import { IUser } from '../../models/user';
+import { api } from '../../services/api';
 
 export const Home: React.FC = () => {
   const { user, signOut } = useAuth();
+
+  const [users, setUsers] = React.useState<IUser[]>([]);
+
+  React.useEffect(() => {
+    const loadUsers = async () => {
+      const response = await api.get('users');
+      setUsers(response.data);
+    };
+
+    loadUsers();
+  }, []);
 
   const handleSignOut = () => {
     Alert.alert('Tem certeza?', 'Deseja realmente sair da aplicação?', [

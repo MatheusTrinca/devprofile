@@ -40,6 +40,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
       const user = await AsyncStorage.getItem(userData);
 
       if (token && user) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setData({ token, user: JSON.parse(user) });
       }
     };
@@ -52,12 +53,12 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
         email,
         password,
       });
-
-      console.log(response.data);
       const { token, user } = response.data;
 
       await AsyncStorage.setItem(tokenData, token);
       await AsyncStorage.setItem(userData, JSON.stringify(user));
+
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       setData({ token, user });
     } catch (error) {
