@@ -11,17 +11,28 @@ import {
   UserWrapper,
   Icon,
   LogOutButton,
+  UserList,
+  UserListHeader,
+  UserListEmpty,
 } from './styles';
 import defaultAvatar from '../../assets/avatar02.png';
 import { useAuth } from '../../context/AuthContext';
 import { Alert } from 'react-native';
 import { IUser } from '../../models/user';
 import { api } from '../../services/api';
+import { User } from '../../components/User';
+import { useNavigation } from '@react-navigation/native';
+
+interface IScreenNavigationProps {
+  navigate: (screen: string, params?: unknown) => void;
+}
 
 export const Home: React.FC = () => {
   const { user, signOut } = useAuth();
 
   const [users, setUsers] = React.useState<IUser[]>([]);
+
+  const { navigate } = useNavigation<IScreenNavigationProps>();
 
   React.useEffect(() => {
     const loadUsers = async () => {
@@ -43,6 +54,10 @@ export const Home: React.FC = () => {
         onPress: () => signOut(),
       },
     ]);
+  };
+
+  const handleUserDetails = (userId: string) => {
+    navigate('UserDetails', { userId });
   };
 
   return (
@@ -67,6 +82,17 @@ export const Home: React.FC = () => {
           </LogOutButton>
         </UserWrapper>
       </Header>
+      <UserList
+        data={users}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <User data={item} onPress={() => handleUserDetails(item.id)} />
+        )}
+        ListHeaderComponent={<UserListHeader>Usuários</UserListHeader>}
+        ListEmptyComponent={
+          <UserListEmpty>Ops! Ainda não há registros.</UserListEmpty>
+        }
+      />
     </Container>
   );
 };
