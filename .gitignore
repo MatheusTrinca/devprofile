@@ -53,3 +53,7 @@ buck-out/
 .expo/
 web-build/
 dist/
+
+
+# Para não ficar trocando o IP
+src/services/api.ts
