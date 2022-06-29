@@ -24,12 +24,13 @@ import { Button } from '../../components/form/Button';
 
 interface ScreenNavigationProps {
   goBack: () => void;
+  navigate: (screen: string) => void;
 }
 
 export const UserProfile: React.FC = () => {
   const { user } = useAuth();
 
-  const { goBack } = useNavigation<ScreenNavigationProps>();
+  const { goBack, navigate } = useNavigation<ScreenNavigationProps>();
 
   return (
     <Container>
@@ -62,7 +63,10 @@ export const UserProfile: React.FC = () => {
           <EmailData>{user.email}</EmailData>
         </UserEmailDetail>
 
-        <Button title="Editar dados do perfil" onPress={() => {}} />
+        <Button
+          title="Editar dados do perfil"
+          onPress={() => navigate('UserProfileEdit')}
+        />
         <Button title="Trocar Senha" onPress={() => {}} />
       </Content>
     </Container>
